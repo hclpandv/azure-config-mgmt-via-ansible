@@ -33,7 +33,7 @@ fi
 
 # Install ansible collection for azure and dependencies
 ansible-galaxy collection install azure.azcollection
-ansible-galaxy collection install community.general
+ansible-galaxy collection install community.general --force
 
 # install azure collection dependencies
 COLLECTION_PATH="$VENV_DIR/lib/python3.12/site-packages/ansible_collections/azure/azcollection"

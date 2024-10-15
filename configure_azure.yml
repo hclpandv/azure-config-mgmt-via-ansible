@@ -7,16 +7,50 @@
     - azure.azcollection
 
   vars:
+    # Load Azure credentials from the .env file using the community.general.env lookup
+    subscription_id: "{{ lookup('ansible.builtin.env', 'SUBSCRIPTION_ID') }}"
+    client_id: "{{ lookup('ansible.builtin.env', 'CLIENT_ID') }}"
+    secret: "{{ lookup('ansible.builtin.env', 'CLIENT_SECRET') }}"
+    tenant: "{{ lookup('ansible.builtin.env', 'TENANT_ID') }}"
+    # azure resources to be created
     resource_group: rg-ansible-test-01
     location: westeurope
-    # Load Azure credentials from the .env file using the community.general.env lookup
-    azure_subscription_id: "{{ lookup('community.general.env', 'SUBSCRIPTION_ID') }}"
-    azure_client_id: "{{ lookup('community.general.env', 'CLIENT_ID') }}"
-    azure_secret: "{{ lookup('community.general.env', 'CLIENT_SECRET') }}"
-    azure_tenant: "{{ lookup('community.general.env', 'TENANT_ID') }}"
-
+    # azure vms to configure
+    vm_name: ttfappwevm01
+    vm_resource_group: rg-module-test-01
+    vm_os_family: windows
+    
   tasks:
-    - name: Create resource group
-      azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
-        location: "{{ location }}"
+  - name: Create a sample resource group
+    azure_rm_resourcegroup:
+      name: "{{ resource_group }}"
+      location: "{{ location }}"
+      client_id: "{{ client_id }}"
+      tenant: "{{ tenant }}"
+      secret: "{{ secret }}"
+      subscription_id: "{{ subscription_id }}"
+      
+
+  - name: Configure the azure vm {{ vm_name }}/{{ vm_resource_group }}
+    debug:
+      msg: | 
+        Client {{ client_id }} is configuring VM: {{ vm_name }}/{{ vm_resource_group }} in Azure subscription {{ subscription_id }}
+
+  - name: invoke_azurerm_vm_run_command
+    invoke_azurerm_vm_run_command:
+      vm_name: ttfappwevm01
+      vm_resource_group: rg-module-test-01
+      run_command: "get-wmiobject win32_computersystem"
+      client_id: "{{ client_id }}"
+      tenant_id: "{{ tenant }}"
+      client_secret: "{{ secret }}"
+      subscription_id: "{{ subscription_id }}"
+    register: vm_run_cmd_output
+    no_log: true
+    ignore_errors: true
+
+  - name: Display run_command output
+    debug:
+      msg: |
+        python_script_result : {{ vm_run_cmd_output.original_message }}
+    ignore_errors: true
