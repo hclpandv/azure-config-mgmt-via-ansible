@@ -1,0 +1,4 @@
+python-dotenv
+tzdata==2022.2
+ansible
+setuptools

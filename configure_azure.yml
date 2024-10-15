@@ -1,0 +1,22 @@
+---
+- name: Create an Azure Resource Group
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  collections:
+    - azure.azcollection
+
+  vars:
+    resource_group: rg-ansible-test-01
+    location: westeurope
+    # Load Azure credentials from the .env file using the community.general.env lookup
+    azure_subscription_id: "{{ lookup('community.general.env', 'SUBSCRIPTION_ID') }}"
+    azure_client_id: "{{ lookup('community.general.env', 'CLIENT_ID') }}"
+    azure_secret: "{{ lookup('community.general.env', 'CLIENT_SECRET') }}"
+    azure_tenant: "{{ lookup('community.general.env', 'TENANT_ID') }}"
+
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: "{{ location }}"
