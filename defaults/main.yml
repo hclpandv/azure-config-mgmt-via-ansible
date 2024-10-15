@@ -1,0 +1,5 @@
+# Load Azure credentials from the .env file using the community.general.env lookup
+subscription_id: "{{ lookup('ansible.builtin.env', 'SUBSCRIPTION_ID') }}"
+client_id: "{{ lookup('ansible.builtin.env', 'CLIENT_ID') }}"
+secret: "{{ lookup('ansible.builtin.env', 'CLIENT_SECRET') }}"
+tenant: "{{ lookup('ansible.builtin.env', 'TENANT_ID') }}"
